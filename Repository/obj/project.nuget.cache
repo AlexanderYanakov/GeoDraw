@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "VDpotuOticp4i97dM42to7przOzyizvjb6zsAjQxNawrBUwqgvEnmxaXjbWXW15A3Qu7H0hBTwbeqDpjMG2olQ==",
+  "success": true,
+  "projectFilePath": "C:\\Drive\\C#Programm\\GeoDraw\\Repository\\Repository.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Alexander\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\Alexander\\.nuget\\packages\\npgsql\\7.0.4\\npgsql.7.0.4.nupkg.sha512",
+    "C:\\Users\\Alexander\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\Alexander\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.18\\microsoft.netcore.app.ref.6.0.18.nupkg.sha512"
+  ],
+  "logs": []
+}

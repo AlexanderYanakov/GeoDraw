@@ -1,0 +1,12 @@
+C:\Drive\C#Programm\GeoDraw\Domain\bin\Debug\net6.0\Domain.deps.json
+C:\Drive\C#Programm\GeoDraw\Domain\bin\Debug\net6.0\Domain.dll
+C:\Drive\C#Programm\GeoDraw\Domain\bin\Debug\net6.0\Domain.pdb
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.csproj.AssemblyReference.cache
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.AssemblyInfoInputs.cache
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.AssemblyInfo.cs
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.csproj.CoreCompileInputs.cache
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.dll
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\refint\Domain.dll
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\Domain.pdb
+C:\Drive\C#Programm\GeoDraw\Domain\obj\Debug\net6.0\ref\Domain.dll

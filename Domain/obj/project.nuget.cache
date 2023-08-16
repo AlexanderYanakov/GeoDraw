@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "BmLoPwlN3txQ+VXy75Y7n96+9Wo7waTa/3b+swGkFcCGPvilUkMLJ3jyQ5n+caIpViQ9jYIMBVti7lUQC/yL6g==",
+  "success": true,
+  "projectFilePath": "C:\\Drive\\C#Programm\\GeoDraw\\Domain\\Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Alexander\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.18\\microsoft.netcore.app.ref.6.0.18.nupkg.sha512"
+  ],
+  "logs": []
+}
