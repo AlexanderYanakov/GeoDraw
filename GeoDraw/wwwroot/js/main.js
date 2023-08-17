@@ -1,6 +1,16 @@
 var map = undefined;
 var isPolygon = false;
 
+var markers = [];
+var lines = [];
+var rectangles = [];
+var polygons = [];
+
+
+
+var test = undefined;
+var test1 = undefined;
+
 // load map
 window.onload = (event) => {
     map = L.map('map').setView([41.505, 42.09], 5);
@@ -30,6 +40,14 @@ function clearMarkers(clickedPoints) {
     clickedPoints = [];
 }
 
+function separateLatLng(list) {
+    var separatedLatLng = [];
+    for (let i = 0; i < list.length; i++) {
+        separatedLatLng.push(list[i].getLatLng())
+    }
+    return separatedLatLng;
+}
+
 // showPopupFunction
 function showPopup() {
     const popup = document.getElementById("popup")
@@ -45,16 +63,52 @@ function hidePopup() {
     popup.style.right = "-150px"
 }
 
+function saveData() {
+    map.off('click');
+    
+    var figureData = {
+        markerList: separateLatLng(markers),
+        lineList: separateLatLng(lines),
+        rectangleList: separateLatLng(rectangles),
+        polygonList: separateLatLng(polygon)
+    };
+
+    sendFiguresToBackend(figureData);
+}
+
+function sendFiguresToBackend(figureData) {
+    var a = JSON.stringify(figureData);
+    var backendURL = "http://localhost:5238/Home/CreateFigure";
+    fetch(backendURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: a
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Figures were successfully sent to the backend', data);
+        })
+        .catch(error => {
+            console.error('There was a problem sending figures to the backend', error);
+        });
+
+}
+
 // addMarkerFunction
 function addMarker() {
     map.on('click', function (event) {
         var lon = event.latlng.lng;
         var lat = event.latlng.lat;
-        var marker = L.marker([lat, lon]).addTo(map);
+        markers.push(L.marker([lat, lon]).addTo(map));
         map.off("click");
-        return marker;
     });
-
 }
 
 // addLineFunction
@@ -72,11 +126,10 @@ function addLine() {
 
             // Если у нас уже есть как минимум две точки, рисуем линию
             if (drawnLines.length === 2) {
-                var line = L.polyline(drawnLines, { color: 'black' }).addTo(map);
-                // Удаляем маркеры и линию после построения линии
+                lines.push(L.polyline(drawnLines, { color: 'black' }).addTo(map));
+                // Удаляем маркеры после построения линии
                 setTimeout(clearMarkers(clickedPoints), 1);
                 map.off('click');
-                return line;
             }
         }
     });
@@ -85,7 +138,7 @@ function addLine() {
 // addRectangleFunction
 function addRectangle() {
     var clickedPoints = [];
-    var drawnLines = [];
+    var drawnRectangleLines = [];
 
     map.on('click', function (event) {
         if (clickedPoints.length < 4) {
@@ -93,12 +146,12 @@ function addRectangle() {
             clickedPoints.push(L.circleMarker(latLng, { radius: 2, color: 'red', fillOpacity: 1 }).addTo(map));
 
             // Добавляем координаты в массив для создания линий
-            drawnLines.push(latLng);
+            drawnRectangleLines.push(latLng);
 
             // Если у нас уже есть как минимум две точки, рисуем линии
-            if (drawnLines.length >= 2) {
-                var lastPoint = drawnLines[drawnLines.length - 2];
-                var currentPoint = drawnLines[drawnLines.length - 1];
+            if (drawnRectangleLines.length >= 2) {
+                var lastPoint = drawnRectangleLines[drawnRectangleLines.length - 2];
+                var currentPoint = drawnRectangleLines[drawnRectangleLines.length - 1];
                 L.polyline([lastPoint, currentPoint], { color: 'black' }).addTo(map);
             }
 
@@ -108,23 +161,23 @@ function addRectangle() {
                 var lastPoint = clickedPoints[clickedPoints.length - 1];
 
                 L.polyline([lastPoint.getLatLng(), firstPoint.getLatLng()], { color: 'black' }).addTo(map);
-                drawnLines.push(drawnLines[0]);
-                var rectangle = drawnLines;
-                // Удаляем маркеры и линии после завершения фигуры
+
+                drawnRectangleLines.push(drawnRectangleLines[0]);
+                rectangles.push(drawnRectangleLines);
+                // Удаляем маркеры после завершения фигуры
                 setTimeout(clearMarkers(clickedPoints), 1);
                 map.off('click');
-                return rectangle;
             }
         }
     });
 
 
-    //var geoServerLayer = L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
-    //    layers: 'lines',
-    //    format: 'image/png',
-    //    transparent: true
-    //}).addTo(map);
-    //var a = undefined;
+    //L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
+    //     layers: 'lines',
+    //     format: 'image/png',
+    //     transparent: true
+    // }).addTo(map);
+    // var a = undefined;
 }
 
 var isDrawingPolygon = false;
@@ -133,7 +186,7 @@ var polygon = undefined;
 function addPolygon() {
     if (isDrawingPolygon === true) {
         var result = stopDrawingPolygon();
-        return result;
+        polygons.push(result);
     }
     isDrawingPolygon = true;
     var polygonPoints = [];
@@ -152,4 +205,3 @@ function addPolygon() {
         }
     });
 }
-

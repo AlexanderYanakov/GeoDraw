@@ -1,6 +1,5 @@
 ﻿@page
 @model GeoDraw.Views.Map.IndexModel
-@inject GeoDraw.Controllers.FigureController controller;
 @{
 }
 <div id="map" style="width: 100vw; height: 100vh; z-index: 0;"></div>
@@ -8,98 +7,11 @@
 <button id="main-button" onclick="showPopup()">Tools</button>
 <div id="popup">
     <div style="display: flex; flex-direction: column;">
-        <button id="addMarkerButton">&#128205;</button>
-        <button id="addLineButton">&#8260;</button>
-        <button id="addRectangleButton">&#9645;</button>
-        <button id="addPolygonButton">&#9670;</button>
-        <button onclick="saveShapes()">&#11123;</button>
+        <button onclick="addMarker()">&#128205;</button>
+        <button onclick="addLine()">&#8260;</button>
+        <button onclick="addRectangle()">&#9645;</button>
+        <button onclick="addPolygon()">&#9670;</button>
+        <button onclick="saveData()">&#11123;</button>
     </div>
     <button id="close-button" onclick="hidePopup()">&#10006;</button>
 </div>
-
-<script>
-    var marker = undefined;
-    var line = undefined;
-    var rectangle = undefined;
-    var polygon = undefined;
-
-    // MarkerButtonListener
-    document.addEventListener("DOMContentLoaded", function () {
-        var addMarkerButton = document.getElementById("addMarkerButton");
-
-        addMarkerButton.addEventListener("click", function () {
-            // Вызов метода AddMarker() и сохранение результата в переменной
-            marker = addMarker();
-
-        });
-    });
-
-    // LineButtonListener
-    document.addEventListener("DOMContentLoaded", function () {
-        var addLineButton = document.getElementById("addLineButton");
-
-        addLineButton.addEventListener("click", function () {
-            // Вызов метода addLine() и сохранение результата в переменной
-            line = addLine();
-
-        });
-    });
-
-    // RectangleButtonListener
-    document.addEventListener("DOMContentLoaded", function () {
-        var addRectangleButton = document.getElementById("addRectangleButton");
-
-        addRectangleButton.addEventListener("click", function () {
-            // Вызов метода addRectangle() и сохранение результата в переменной
-            rectangle = addRectangle();
-
-        });
-    });
-
-    // PolygonButtonListener
-    document.addEventListener("DOMContentLoaded", function () {
-        var addPolygonButton = document.getElementById("addPolygonButton");
-
-        addPolygonButton.addEventListener("click", function () {
-            // Вызов метода addPolygon() и сохранение результата в переменной
-            polygon = addPolygon();
-
-        });
-    });
-
-    // SaveButtonListener
-    document.addEventListener("DOMContentLoaded", function () {
-        var saveButton = document.getElementById("saveButton");
-
-        saveButton.addEventListener("click", function () {
-            // Вызов метода addPolygon() и сохранение результата в переменной
-            saveShapes();
-
-        });
-    });
-
-
-    function saveShapes() {
-
-        map.off('click');
-
-        if (marker) {
-            drawnShapes.push(marker);
-            marker = null;
-        }
-        if (polygon) {
-            drawnShapes.push(polygon);
-            polygon = null;
-        }
-        if (line) {
-            drawnShapes.push(line);
-            line = null;
-        }
-        if (rectangle) {
-            drawnShapes.push(rectangle);
-            rectangle = null;
-        }
-        sendShapesToBackend(drawnShapes);
-    }
-
-</script>
