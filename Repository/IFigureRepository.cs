@@ -1,10 +1,11 @@
-﻿namespace Repository
+﻿using GeoDraw.DTO;
+
+namespace Repository
 {
     public interface IFigureRepository
     {
-        void CreateMarker();
-        void CreateLine();
-        void CreateRectangle();
-        void CreatePolygon();
+        Task CreateMarker(List<Coordinates> markerList);
+        Task CreateLine(List<List<Coordinates>> lineList);
+        Task CreatePolygon(List<List<Coordinates>> RectangleList);
     }
 }

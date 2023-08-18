@@ -7,19 +7,45 @@ namespace GeoDraw.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IFigureRepository _figureRepository;
+        private readonly IFigureRepository FigureRepository;
 
         public HomeController(IFigureRepository figureRepository)
         {
-            _figureRepository = figureRepository;
+            FigureRepository = figureRepository;
         }
         // POST: HomeController/Create
         [HttpPost]
-        public ActionResult CreateFigure([FromBody] object figureData)
+        public async Task<ActionResult> CreateFigure([FromBody] FigureDto figureData)
         {
             try
             {
-                // Обработайте figureData (например, сохраните его в базе данных)
+                if (figureData.MarkerList.Count() != 0)
+                {
+                    await FigureRepository.CreateMarker(figureData.MarkerList);
+                    Dislocation(figureData.MarkerList);
+                    await FigureRepository.CreateMarker(figureData.MarkerList);
+                }
+
+                if (figureData.LineList.Count() != 0)
+                {
+                    await FigureRepository.CreateLine(figureData.LineList);
+                    figureData.LineList.ForEach(x => Dislocation(x));
+                    await FigureRepository.CreateLine(figureData.LineList);
+                }
+
+                if (figureData.RectangleList.Count() != 0)
+                {
+                    await FigureRepository.CreatePolygon(figureData.RectangleList);
+                    figureData.RectangleList.ForEach(x => Dislocation(x));
+                    await FigureRepository.CreatePolygon(figureData.RectangleList);
+                }
+
+                if (figureData.PolygonList.Count() != 0)
+                {
+                    await FigureRepository.CreatePolygon(figureData.PolygonList);
+                    figureData.PolygonList.ForEach(x => Dislocation(x));
+                    await FigureRepository.CreatePolygon(figureData.PolygonList);
+                }
 
                 return Ok(new { message = "Figures were successfully created" });
             }
@@ -27,6 +53,15 @@ namespace GeoDraw.Controllers
             {
                 return BadRequest(new { message = "Failed to create figures" });
             }
+        }
+
+        private void Dislocation(List<Coordinates> coordinates)
+        {
+            coordinates.ForEach(x =>
+            {
+                x.lng += 1;
+                x.lat += 1;
+            });
         }
     }
 }

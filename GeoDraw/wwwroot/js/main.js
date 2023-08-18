@@ -6,16 +6,35 @@ var lines = [];
 var rectangles = [];
 var polygons = [];
 
-
-
-var test = undefined;
-var test1 = undefined;
-
 // load map
 window.onload = (event) => {
     map = L.map('map').setView([41.505, 42.09], 5);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 20,
+    }).addTo(map);
+
+    L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
+        layers: 'lines',
+        format: 'image/png',
+        transparent: true
+    }).addTo(map);
+
+    L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
+        layers: 'markers',
+        format: 'image/png',
+        transparent: true
+    }).addTo(map);
+
+    L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
+        layers: 'rectangles',
+        format: 'image/png',
+        transparent: true
+    }).addTo(map);
+
+    L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
+        layers: 'polyhons',
+        format: 'image/png',
+        transparent: true
     }).addTo(map);
 }
 
@@ -43,9 +62,44 @@ function clearMarkers(clickedPoints) {
 function separateLatLng(list) {
     var separatedLatLng = [];
     for (let i = 0; i < list.length; i++) {
-        separatedLatLng.push(list[i].getLatLng())
+        var a = list[i].getLatLng();
+        separatedLatLng.push(a)
     }
     return separatedLatLng;
+}
+
+function separateRectangleLatLng(list) {
+    var separatedRectangleLatLng = [];
+    for (let i = 0; i < list.length; i++) {
+        var a = list[i].getLatLngs();
+        separatedRectangleLatLng.push(a[0]);
+    }
+
+    return separatedRectangleLatLng;
+}
+
+function separatePolygonLatLng(list) {
+
+    var separatedPolygonLatLng = [];
+    if (list !== undefined) {
+        separatedPolygonLatLng = list.getLatLngs()
+    }
+
+
+    return separatedPolygonLatLng;
+}
+
+function separateLineLatLng(list) {
+    var separateLineLatLng = [];
+    for (let i = 0; i < list.length; i++) {
+        var latLngs = list[i].getLatLngs()
+        var separatedLatLng = [];
+        for (let j = 0; j < latLngs.length; j++) {
+            separatedLatLng.push(latLngs[j]);
+        }
+        separateLineLatLng.push(separatedLatLng);
+    }
+    return separateLineLatLng;
 }
 
 // showPopupFunction
@@ -65,12 +119,12 @@ function hidePopup() {
 
 function saveData() {
     map.off('click');
-    
+
     var figureData = {
-        markerList: separateLatLng(markers),
-        lineList: separateLatLng(lines),
-        rectangleList: separateLatLng(rectangles),
-        polygonList: separateLatLng(polygon)
+        MarkerList: separateLatLng(markers),
+        LineList: separateLineLatLng(lines),
+        RectangleList: separateRectangleLatLng(rectangles),
+        PolygonList: separatePolygonLatLng(polygon)
     };
 
     sendFiguresToBackend(figureData);
@@ -113,13 +167,13 @@ function addMarker() {
 
 // addLineFunction
 function addLine() {
-    var clickedPoints = [];
+    var lineClickedPoints = [];
     var drawnLines = [];
 
     map.on('click', function (event) {
-        if (clickedPoints.length < 2) {
+        if (lineClickedPoints.length < 2) {
             var latLng = event.latlng;
-            clickedPoints.push(L.circleMarker(latLng, { radius: 2, color: 'red', fillOpacity: 1 }).addTo(map));
+            lineClickedPoints.push(L.circleMarker(latLng, { radius: 2, color: 'red', fillOpacity: 1 }).addTo(map));
 
             // Добавляем координаты в массив для создания линии
             drawnLines.push(latLng);
@@ -128,7 +182,7 @@ function addLine() {
             if (drawnLines.length === 2) {
                 lines.push(L.polyline(drawnLines, { color: 'black' }).addTo(map));
                 // Удаляем маркеры после построения линии
-                setTimeout(clearMarkers(clickedPoints), 1);
+                setTimeout(clearMarkers(lineClickedPoints), 1);
                 map.off('click');
             }
         }
@@ -137,48 +191,30 @@ function addLine() {
 
 // addRectangleFunction
 function addRectangle() {
-    var clickedPoints = [];
-    var drawnRectangleLines = [];
+    var rectangleClickedPoints = [];
+    var drawnRectanglePoints = [];
 
     map.on('click', function (event) {
-        if (clickedPoints.length < 4) {
+        if (rectangleClickedPoints.length < 4) {
             var latLng = event.latlng;
-            clickedPoints.push(L.circleMarker(latLng, { radius: 2, color: 'red', fillOpacity: 1 }).addTo(map));
+            rectangleClickedPoints.push(L.circleMarker(latLng, { radius: 2, color: 'red', fillOpacity: 1 }).addTo(map));
 
-            // Добавляем координаты в массив для создания линий
-            drawnRectangleLines.push(latLng);
+            // Добавляем координаты в массив для создания полигона
+            drawnRectanglePoints.push(latLng);
 
-            // Если у нас уже есть как минимум две точки, рисуем линии
-            if (drawnRectangleLines.length >= 2) {
-                var lastPoint = drawnRectangleLines[drawnRectangleLines.length - 2];
-                var currentPoint = drawnRectangleLines[drawnRectangleLines.length - 1];
-                L.polyline([lastPoint, currentPoint], { color: 'black' }).addTo(map);
-            }
+            if (rectangleClickedPoints.length === 4) {
+                // Создаем полигон из 4 точек
+                rectangles.push(L.polygon(drawnRectanglePoints, { color: 'black' }).addTo(map));
 
-            if (clickedPoints.length === 4) {
-                // Замыкаем квадрат линиями
-                var firstPoint = clickedPoints[0];
-                var lastPoint = clickedPoints[clickedPoints.length - 1];
-
-                L.polyline([lastPoint.getLatLng(), firstPoint.getLatLng()], { color: 'black' }).addTo(map);
-
-                drawnRectangleLines.push(drawnRectangleLines[0]);
-                rectangles.push(drawnRectangleLines);
-                // Удаляем маркеры после завершения фигуры
-                setTimeout(clearMarkers(clickedPoints), 1);
+                setTimeout(clearMarkers(rectangleClickedPoints), 1);
                 map.off('click');
             }
         }
     });
-
-
-    //L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
-    //     layers: 'lines',
-    //     format: 'image/png',
-    //     transparent: true
-    // }).addTo(map);
-    // var a = undefined;
 }
+
+
+
 
 var isDrawingPolygon = false;
 var polygon = undefined;

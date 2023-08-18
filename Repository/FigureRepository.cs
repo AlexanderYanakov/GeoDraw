@@ -1,47 +1,98 @@
-﻿namespace Repository;
+﻿using GeoDraw.DTO;
+using Npgsql;
+using System.Data.SqlClient;
+
+namespace Repository;
 
 public class FigureRepository : IFigureRepository
 {
-    private string _connectionString = "Server=localhost;Port=5432;Database=FigureDb;UserId=postgres;Password=89187786606Alex";
+    private string connectionString = "Server=localhost;Port=5432;Database=FigureDb;UserId=postgres;Password=285020";
 
-    public void CreateMarker()
+    public async Task CreateMarker(List<Coordinates> markerList)
     {
-        //INSERT INTO your_table_name(geom, name)
-        //VALUES(
-        //ST_SetSRID(ST_MakePoint(12.34, 56.78), 4326),
-        //'Маркер A'
-        //)
-    }
-    public void CreateLine()
-    {
-        //INSERT INTO your_table_name(geom, name)
-        //VALUES(
-        //ST_SetSRID(ST_MakeLine(
-        //ST_MakePoint(12.34, 56.78),
-        //ST_MakePoint(23.45, 67.89)
-        //), 4326),
-        //'Line A'
-        //);
-    }
+        using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+        {
+            await connection.OpenAsync();
 
-    public void CreatePolygon()
-    {
-        //INSERT INTO your_table_name(geom, name)
-        //VALUES(
-        //ST_SetSRID(ST_GeomFromText('POLYGON((12.34 56.78, 23.45 56.78, 23.45 67.89, 12.34 67.89, 12.34 56.78))'), 4326),
-        //'Полигон A'
-        //);
-    }
+            foreach (Coordinates coordinates in markerList)
+            {
+                using (NpgsqlCommand command = new NpgsqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = "INSERT INTO markers(geom, name) VALUES(ST_SetSRID(ST_MakePoint(@lon, @lat), 4326), @name)";
+                    command.Parameters.AddWithValue("lon", coordinates.lng);
+                    command.Parameters.AddWithValue("lat", coordinates.lat);
+                    command.Parameters.AddWithValue("name", "Marker");
 
-    public void CreateRectangle()
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+    }
+    public async Task CreateLine(List<List<Coordinates>> lineList)
     {
-        //INSERT INTO rectangles(geom, name)
-        //VALUES(
-        //ST_SetSRID(ST_MakePolygon(
-        //ST_GeomFromText('LINESTRING(12.34 56.78, 23.45 56.78, 23.45 67.89, 12.34 67.89, 12.34 56.78)')
-        //), 4326),
-        //'Прямоугольник A'
-        //);
+        using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+        {
+            await connection.OpenAsync();
+
+            foreach (List<Coordinates> lineCoordinates in lineList)
+            {
+                using (NpgsqlCommand command = new NpgsqlCommand())
+                {
+                    command.Connection = connection;
+
+                    // Create the WKT (Well-Known Text) representation of the line
+                    string wktLine = "LINESTRING(";
+                    foreach (Coordinates coordinates in lineCoordinates)
+                    {
+                        wktLine += $"{coordinates.lng} {coordinates.lat},";
+                    }
+                    wktLine = wktLine.TrimEnd(',') + ")";
+
+                    command.CommandText = "INSERT INTO lines(geom, name) VALUES(ST_SetSRID(ST_GeomFromText(@wktLine), 4326), @name)";
+                    command.Parameters.AddWithValue("wktLine", wktLine);
+                    command.Parameters.AddWithValue("name", "Line");
+
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+    }
+    public async Task CreatePolygon(List<List<Coordinates>> rectangleList)
+    {
+        foreach(var list in rectangleList)
+        {
+            list.Add(list.First());
+        }
+        using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+        {
+            await connection.OpenAsync();
+
+            foreach (List<Coordinates> rectangleCoordinates in rectangleList)
+            {
+                using (NpgsqlCommand command = new NpgsqlCommand())
+                {
+                    command.Connection = connection;
+
+                    string wktRectangle = "'LINESTRING(";
+                    foreach (Coordinates coordinates in rectangleCoordinates)
+                    {
+                        wktRectangle += $"{coordinates.lng} {coordinates.lat}, ";
+                    }
+                    //wktRectangle = wktRectangle.TrimEnd(',') + ")')";
+                    int lastIndex = wktRectangle.LastIndexOf(",");
+                    string coordinatesString = null;
+                    if (lastIndex >= 0)
+                    {
+                        coordinatesString = wktRectangle.Substring(0, lastIndex) + wktRectangle.Substring(lastIndex + 1);
+                    }
+                    var resultString = "INSERT INTO rectangles(geom, name)VALUES(ST_SetSRID(ST_MakePolygon(ST_GeomFromText(@coordinatesString)')), 4326), 'Rectangle')";
+                    command.CommandText = resultString.Replace("@coordinatesString", coordinatesString);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
     }
 }
 
