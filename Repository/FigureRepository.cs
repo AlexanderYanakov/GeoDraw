@@ -1,4 +1,5 @@
-﻿using GeoDraw.DTO;
+﻿using DTO;
+using GeoDraw.DTO;
 using Npgsql;
 using System.Data.SqlClient;
 
@@ -58,9 +59,21 @@ public class FigureRepository : IFigureRepository
             }
         }
     }
-    public async Task CreatePolygon(List<List<Coordinates>> rectangleList)
+    public async Task CreatePolygon(List<List<Coordinates>> polygonList, FigureType type)
     {
-        foreach(var list in rectangleList)
+        string keyWord = null;
+        switch (type)
+        {
+            case FigureType.RECTANGLE:
+                keyWord = "rectangles";
+                break;
+
+            case FigureType.POLYGON:
+                keyWord = "polygons";
+                break;
+        }
+
+        foreach (var list in polygonList)
         {
             list.Add(list.First());
         }
@@ -68,26 +81,27 @@ public class FigureRepository : IFigureRepository
         {
             await connection.OpenAsync();
 
-            foreach (List<Coordinates> rectangleCoordinates in rectangleList)
+            foreach (List<Coordinates> rectangleCoordinates in polygonList)
             {
                 using (NpgsqlCommand command = new NpgsqlCommand())
                 {
                     command.Connection = connection;
 
-                    string wktRectangle = "'LINESTRING(";
+                    string crdRectangle = "'LINESTRING(";
                     foreach (Coordinates coordinates in rectangleCoordinates)
                     {
-                        wktRectangle += $"{coordinates.lng} {coordinates.lat}, ";
+                        crdRectangle += $"{coordinates.lng} {coordinates.lat}, ";
                     }
-                    //wktRectangle = wktRectangle.TrimEnd(',') + ")')";
-                    int lastIndex = wktRectangle.LastIndexOf(",");
+                    int lastIndex = crdRectangle.LastIndexOf(",");
                     string coordinatesString = null;
                     if (lastIndex >= 0)
                     {
-                        coordinatesString = wktRectangle.Substring(0, lastIndex) + wktRectangle.Substring(lastIndex + 1);
+                        coordinatesString = crdRectangle.Substring(0, lastIndex) + crdRectangle.Substring(lastIndex + 1);
                     }
-                    var resultString = "INSERT INTO rectangles(geom, name)VALUES(ST_SetSRID(ST_MakePolygon(ST_GeomFromText(@coordinatesString)')), 4326), 'Rectangle')";
-                    command.CommandText = resultString.Replace("@coordinatesString", coordinatesString);
+                    var resultString = "INSERT INTO @tableName(geom, name)VALUES(ST_SetSRID(ST_MakePolygon(ST_GeomFromText(@coordinatesString)')), 4326), 'Rectangle')";
+                    var replacedString = resultString.Replace("@coordinatesString", coordinatesString);
+                    var finalSQL = replacedString.Replace("@tableName", keyWord);
+                    command.CommandText = finalSQL;
 
                     await command.ExecuteNonQueryAsync();
                 }

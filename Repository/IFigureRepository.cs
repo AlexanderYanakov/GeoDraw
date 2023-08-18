@@ -1,4 +1,5 @@
-﻿using GeoDraw.DTO;
+﻿using DTO;
+using GeoDraw.DTO;
 
 namespace Repository
 {
@@ -6,6 +7,6 @@ namespace Repository
     {
         Task CreateMarker(List<Coordinates> markerList);
         Task CreateLine(List<List<Coordinates>> lineList);
-        Task CreatePolygon(List<List<Coordinates>> RectangleList);
+        Task CreatePolygon(List<List<Coordinates>> RectangleList, FigureType type);
     }
 }

@@ -32,7 +32,7 @@ window.onload = (event) => {
     }).addTo(map);
 
     L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
-        layers: 'polyhons',
+        layers: 'polygons',
         format: 'image/png',
         transparent: true
     }).addTo(map);
@@ -157,6 +157,7 @@ function sendFiguresToBackend(figureData) {
 
 // addMarkerFunction
 function addMarker() {
+    map.off('click');
     map.on('click', function (event) {
         var lon = event.latlng.lng;
         var lat = event.latlng.lat;
@@ -167,6 +168,7 @@ function addMarker() {
 
 // addLineFunction
 function addLine() {
+    map.off('click');
     var lineClickedPoints = [];
     var drawnLines = [];
 
@@ -191,6 +193,7 @@ function addLine() {
 
 // addRectangleFunction
 function addRectangle() {
+    map.off('click');
     var rectangleClickedPoints = [];
     var drawnRectanglePoints = [];
 
@@ -220,6 +223,7 @@ var isDrawingPolygon = false;
 var polygon = undefined;
 // addPolygonFunction
 function addPolygon() {
+    map.off('click');
     if (isDrawingPolygon === true) {
         var result = stopDrawingPolygon();
         polygons.push(result);
