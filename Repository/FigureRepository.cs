@@ -106,10 +106,5 @@ public class FigureRepository : IFigureRepository
             }
         }
     }
-
-    public Task CheckFigure(Coordinates coordinates)
-    {
-        throw new NotImplementedException();
-    }
 }
 
