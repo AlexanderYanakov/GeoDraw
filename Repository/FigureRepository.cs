@@ -1,7 +1,5 @@
-﻿using DTO;
-using GeoDraw.DTO;
+﻿using GeoDraw.DTO;
 using Npgsql;
-using System.Data.SqlClient;
 
 namespace Repository;
 
@@ -107,6 +105,11 @@ public class FigureRepository : IFigureRepository
                 }
             }
         }
+    }
+
+    public Task CheckFigure(Coordinates coordinates)
+    {
+        throw new NotImplementedException();
     }
 }
 

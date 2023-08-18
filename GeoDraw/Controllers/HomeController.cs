@@ -15,11 +15,13 @@ namespace GeoDraw.Controllers
             FigureRepository = figureRepository;
         }
 
+
         [HttpPost]
         public async Task<ActionResult> CreateFigure([FromBody] FigureDto figureData)
         {
             try
             {
+                // checkfigureData
                 if (figureData.MarkerList.Count() != 0)
                 {
                     await FigureRepository.CreateMarker(figureData.MarkerList);
@@ -56,6 +58,21 @@ namespace GeoDraw.Controllers
             }
         }
 
+        public async Task<ActionResult> Check([FromBody] Coordinates coordinates)
+        {
+            try
+            {
+                await FigureRepository.CheckFigure(coordinates);
+
+                return Ok(new { message = "Figures were successfully created" });
+            }
+            catch
+            {
+                return BadRequest(new { message = "Failed to create figures" });
+            }
+        }
+
+        // setDislocationToCoordinates
         private void Dislocation(List<Coordinates> coordinates)
         {
             coordinates.ForEach(x =>

@@ -13,24 +13,28 @@ window.onload = (event) => {
         maxZoom: 20,
     }).addTo(map);
 
+    // showTile(lines)
     L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
         layers: 'lines',
         format: 'image/png',
         transparent: true
     }).addTo(map);
 
+    // showTile(markers)
     L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
         layers: 'markers',
         format: 'image/png',
         transparent: true
     }).addTo(map);
 
+    // showTile(rectangles)
     L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
         layers: 'rectangles',
         format: 'image/png',
         transparent: true
     }).addTo(map);
 
+    // showTile(polygons)
     L.tileLayer.wms('http://localhost:8080/geoserver/FigureDb/wms', {
         layers: 'polygons',
         format: 'image/png',
@@ -59,6 +63,7 @@ function clearMarkers(clickedPoints) {
     clickedPoints = [];
 }
 
+// separateFunction
 function separateLatLng(list) {
     var separatedLatLng = [];
     for (let i = 0; i < list.length; i++) {
@@ -68,27 +73,27 @@ function separateLatLng(list) {
     return separatedLatLng;
 }
 
+// separateFunction
 function separateRectangleLatLng(list) {
     var separatedRectangleLatLng = [];
     for (let i = 0; i < list.length; i++) {
         var a = list[i].getLatLngs();
         separatedRectangleLatLng.push(a[0]);
     }
-
     return separatedRectangleLatLng;
 }
 
+// separateFunction
 function separatePolygonLatLng(list) {
 
     var separatedPolygonLatLng = [];
     if (list !== undefined) {
         separatedPolygonLatLng = list.getLatLngs()
     }
-
-
     return separatedPolygonLatLng;
 }
 
+// separateFunction
 function separateLineLatLng(list) {
     var separateLineLatLng = [];
     for (let i = 0; i < list.length; i++) {
@@ -117,6 +122,7 @@ function hidePopup() {
     popup.style.right = "-150px"
 }
 
+// saveDataFunction(values in lists will be separated)
 function saveData() {
     map.off('click');
 
@@ -130,6 +136,7 @@ function saveData() {
     sendFiguresToBackend(figureData);
 }
 
+// sendDataToBackend
 function sendFiguresToBackend(figureData) {
     var a = JSON.stringify(figureData);
     var backendURL = "http://localhost:5238/Home/CreateFigure";
@@ -230,7 +237,6 @@ function addPolygon() {
     }
     isDrawingPolygon = true;
     var polygonPoints = [];
-    // Обработчик клика на карте
     map.on('click', function (event) {
         if (isDrawingPolygon) {
             var latLng = event.latlng;
