@@ -1,6 +1,4 @@
-﻿using DTO;
-using GeoDraw.DTO;
-using Microsoft.AspNetCore.Http;
+﻿using GeoDraw.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Repository;
 
@@ -49,20 +47,6 @@ namespace GeoDraw.Controllers
                     figureData.PolygonList.ForEach(x => Dislocation(x));
                     await FigureRepository.CreatePolygon(figureData.PolygonList, FigureType.POLYGON);
                 }
-
-                return Ok(new { message = "Figures were successfully created" });
-            }
-            catch
-            {
-                return BadRequest(new { message = "Failed to create figures" });
-            }
-        }
-
-        public async Task<ActionResult> Check([FromBody] Coordinates coordinates)
-        {
-            try
-            {
-                await FigureRepository.CheckFigure(coordinates);
 
                 return Ok(new { message = "Figures were successfully created" });
             }

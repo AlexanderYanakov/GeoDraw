@@ -7,7 +7,5 @@ namespace Repository
         Task CreateMarker(List<Coordinates> markerList);
         Task CreateLine(List<List<Coordinates>> lineList);
         Task CreatePolygon(List<List<Coordinates>> RectangleList, FigureType type);
-
-        Task CheckFigure(Coordinates coordinates);
     }
 }
