@@ -131,7 +131,16 @@ public class FigureRepository : IFigureRepository
                     "UNION ALL " +
                     "SELECT 'polygons' AS name, ST_AsText(geom) " +
                     "FROM polygons " +
+                    "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)" +
+                    "UNION ALL " +
+                    "SELECT 'markers' AS name, ST_AsText(geom) " +
+                    "FROM polygons " +
+                    "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)" +
+                    "UNION ALL " +
+                    "SELECT 'lines' AS name, ST_AsText(geom) " +
+                    "FROM polygons " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)";
+
                 string replacedLng = sql.Replace("@lng", coordinates.lng.ToString());
                 string replacedLat = replacedLng.Replace("@lat", coordinates.lat.ToString());
                 command.CommandText = replacedLat;
