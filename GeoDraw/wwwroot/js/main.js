@@ -169,8 +169,8 @@ function sendFiguresToBackend(figureData) {
 //////////////////////////////////////////////////////
 function fetchDataFromBackend(latLng) {
     var latLngModel = {
-        lat: parseFloat(latLng.lat),
-        lng: parseFloat(latLng.lng)
+        lat: latLng.lat,
+        lng: latLng.lng
     };
     var json = JSON.stringify(latLngModel);
     var backendURL = "http://localhost:5238/Home/Check";
