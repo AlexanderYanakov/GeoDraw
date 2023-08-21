@@ -189,6 +189,7 @@ function fetchDataFromBackend(latLng) {
         .then(data => {
             console.log('Data successfully fetched from the backend', data);
             var json = JSON.stringify(data, null, 2);
+
             L.popup()
                 .setLatLng(latLng)
                 .setContent('<pre>' + json + '</pre>')

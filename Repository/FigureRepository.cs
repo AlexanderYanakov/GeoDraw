@@ -115,17 +115,17 @@ public class FigureRepository : IFigureRepository
 
     public async Task<string> CheckFigure(Coordinates coordinates)
     {
-        
+
         using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
         {
-            
+
             await connection.OpenAsync();
 
             using (NpgsqlCommand command = new NpgsqlCommand())
             {
                 command.Connection = connection;
 
-                string sql = 
+                string sql =
                     "SELECT 'rectangles' AS name, ST_AsText(geom) FROM rectangles " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1) " +
                     "UNION ALL " +
@@ -138,25 +138,24 @@ public class FigureRepository : IFigureRepository
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
-                    if (reader.Read())
+                    List<CheckFigureDto> listCheckFigure = new List<CheckFigureDto>();
+
+                    while (reader.Read())
                     {
-                        List<CheckFigureDto> listCheckFigure = new List<CheckFigureDto>();
-                        while (reader.Read())
-                        {
-                            string name = reader.GetString(0);
-                            string geom = reader.GetString(1);
-                            var geometry = GeometryFromWKT(geom);
-                            
-                            listCheckFigure.Add(new CheckFigureDto(name, geometry.ToString()));
-                        }
-                        
-                        string responce = JsonSerializer.Serialize(listCheckFigure);
-                        return responce;
+                        string name = reader.GetString(0);
+                        string geom = reader.GetString(1);
+                        var geometry = GeometryFromWKT(geom);
+
+                        listCheckFigure.Add(new CheckFigureDto(name, geometry.ToString()));
                     }
-                    else
+
+                    if (listCheckFigure.Count == 0)
                     {
                         return "Object not found";
                     }
+
+                    string responce = JsonSerializer.Serialize(listCheckFigure);
+                    return responce;
                 }
             }
         }
