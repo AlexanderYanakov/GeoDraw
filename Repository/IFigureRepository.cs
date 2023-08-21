@@ -1,4 +1,5 @@
-﻿using GeoDraw.DTO;
+﻿using DTO.DTO;
+using GeoDraw.DTO;
 
 namespace Repository
 {

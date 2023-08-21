@@ -190,7 +190,7 @@ function fetchDataFromBackend(latLng) {
             console.log('Data successfully fetched from the backend', data);
             L.popup()
                 .setLatLng(latLng)
-                .setContent(data)
+                .setContent()
                 .openOn(map);
         })
         .catch(error => {

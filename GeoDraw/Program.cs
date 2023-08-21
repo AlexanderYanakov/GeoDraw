@@ -13,6 +13,7 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Map/Error");
 }
+
 app.UseStaticFiles();
 
 app.UseRouting();

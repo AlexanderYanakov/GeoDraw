@@ -1,5 +1,11 @@
 ﻿using GeoDraw.DTO;
 using Npgsql;
+using NetTopologySuite;
+using NetTopologySuite.Geometries.Utilities;
+using NetTopologySuite.Geometries;
+using Coordinates = GeoDraw.DTO.Coordinates;
+using DTO.DTO;
+using System.Text.Json;
 
 namespace Repository;
 
@@ -109,18 +115,21 @@ public class FigureRepository : IFigureRepository
 
     public async Task<string> CheckFigure(Coordinates coordinates)
     {
+        
         using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
         {
+            
             await connection.OpenAsync();
 
             using (NpgsqlCommand command = new NpgsqlCommand())
             {
                 command.Connection = connection;
 
-                string sql = "SELECT 'rectangles' AS source, id, name, geom FROM rectangles " +
+                string sql = 
+                    "SELECT 'rectangles' AS name, ST_AsText(geom) FROM rectangles " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1) " +
                     "UNION ALL " +
-                    "SELECT 'polygons' AS source, id, name, geom " +
+                    "SELECT 'polygons' AS name, ST_AsText(geom) " +
                     "FROM polygons " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)";
                 string replacedLng = sql.Replace("@lng", coordinates.lng.ToString());
@@ -131,10 +140,18 @@ public class FigureRepository : IFigureRepository
                 {
                     if (reader.Read())
                     {
-                        string name = reader.GetString(0);
-                        double latitude = reader.GetDouble(2);
-                        double longitude = reader.GetDouble(1);
-                        return $"Name: {name}, Latitude: {latitude}, Longitude: {longitude}";
+                        List<CheckFigureDto> listCheckFigure = new List<CheckFigureDto>();
+                        while (reader.Read())
+                        {
+                            string name = reader.GetString(0);
+                            string geom = reader.GetString(1);
+                            var geometry = GeometryFromWKT(geom);
+                            
+                            listCheckFigure.Add(new CheckFigureDto(name, geometry.ToString()));
+                        }
+                        
+                        string responce = JsonSerializer.Serialize(listCheckFigure);
+                        return responce;
                     }
                     else
                     {
@@ -143,6 +160,11 @@ public class FigureRepository : IFigureRepository
                 }
             }
         }
+    }
+    static Geometry GeometryFromWKT(string wkt)
+    {
+        var reader = new NetTopologySuite.IO.WKTReader();
+        return reader.Read(wkt);
     }
 }
 

@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="7.0.4" />
+    <PackageReference Include="Npgsql.GeoJSON" Version="7.0.4" />
+    <PackageReference Include="Npgsql.NetTopologySuite" Version="7.0.4" />
+  </ItemGroup>
+
 </Project>
