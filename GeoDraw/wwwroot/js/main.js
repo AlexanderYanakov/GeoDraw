@@ -169,7 +169,7 @@ function sendFiguresToBackend(figureData) {
 //////////////////////////////////////////////////////
 function fetchDataFromBackend(latLng) {
     var latLngModel = {
-        lat: parsFloat(latLng.lat),
+        lat: parseFloat(latLng.lat),
         lng: parseFloat(latLng.lng)
     };
     var json = JSON.stringify(latLngModel);
