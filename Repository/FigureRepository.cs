@@ -106,5 +106,44 @@ public class FigureRepository : IFigureRepository
             }
         }
     }
+
+    public async Task<string> CheckFigure(Coordinates coordinates)
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+        {
+            await connection.OpenAsync();
+
+            using (NpgsqlCommand command = new NpgsqlCommand())
+            {
+                command.Connection = connection;
+
+                string sql = "SELECT 'rectangles' AS source, id, name, geom " +
+                    "FROM rectangles " +
+                    "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)" +
+                    "UNION ALL" +
+                    "SELECT 'polygons' AS source, id, name, geom" +
+                    "FROM polygons" +
+                    "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)";
+                string replacedLng = sql.Replace("@lng", coordinates.lng.ToString());
+                string replacedLat = replacedLng.Replace("@lat", coordinates.lat.ToString());
+                command.CommandText = replacedLat;
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.Read())
+                    {
+                        string name = reader.GetString(0);
+                        double latitude = reader.GetDouble(2);
+                        double longitude = reader.GetDouble(1);
+                        return $"Name: {name}, Latitude: {latitude}, Longitude: {longitude}";
+                    }
+                    else
+                    {
+                        return "Object not found";
+                    }
+                }
+            }
+        }
+    }
 }
 

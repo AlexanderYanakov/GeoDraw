@@ -1,5 +1,6 @@
 ﻿using GeoDraw.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 using Repository;
 
 namespace GeoDraw.Controllers
@@ -64,6 +65,21 @@ namespace GeoDraw.Controllers
                 x.lng += 1;
                 x.lat += 1;
             });
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Check([FromHeader] Coordinates coordinates)
+        {
+            try
+            {
+                string responce = await FigureRepository.CheckFigure(coordinates);
+
+                return Ok(responce);
+            }
+            catch
+            {
+                return BadRequest(new { message = "Failed to check figure" });
+            }
         }
     }
 }

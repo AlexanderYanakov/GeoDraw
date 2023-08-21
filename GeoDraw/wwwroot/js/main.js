@@ -40,6 +40,11 @@ window.onload = (event) => {
         format: 'image/png',
         transparent: true
     }).addTo(map);
+
+    map.on('click', function (e) {
+        var latLng = e.latlng;
+        fetchDataFromBackend(latLng);
+    });
 }
 
 // stopDrawingPolygonFunction
@@ -138,14 +143,14 @@ function saveData() {
 
 // sendDataToBackend
 function sendFiguresToBackend(figureData) {
-    var a = JSON.stringify(figureData);
+    var json = JSON.stringify(figureData);
     var backendURL = "http://localhost:5238/Home/CreateFigure";
     fetch(backendURL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: a
+        body: json
     })
         .then(response => {
             if (!response.ok) {
@@ -158,6 +163,40 @@ function sendFiguresToBackend(figureData) {
         })
         .catch(error => {
             console.error('There was a problem sending figures to the backend', error);
+        });
+
+}
+//////////////////////////////////////////////////////
+function fetchDataFromBackend(latLng) {
+    var latLngModel = {
+        lat: parsFloat(latLng.lat),
+        lng: parseFloat(latLng.lng)
+    };
+    var json = JSON.stringify(latLngModel);
+    var backendURL = "http://localhost:5238/Home/Check";
+    fetch(backendURL, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'coordinates': json
+        },
+
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data successfully fetched from the backend', data);
+            L.popup()
+                .setLatLng(latLng)
+                .setContent(data)
+                .openOn(map);
+        })
+        .catch(error => {
+            console.error('There was a problem fetching data from the backend', error);
         });
 
 }
