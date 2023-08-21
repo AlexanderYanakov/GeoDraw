@@ -166,19 +166,17 @@ function sendFiguresToBackend(figureData) {
         });
 
 }
-//////////////////////////////////////////////////////
 function fetchDataFromBackend(latLng) {
     var latLngModel = {
         lat: latLng.lat,
         lng: latLng.lng
     };
-    var json = JSON.stringify(latLngModel);
     var backendURL = "http://localhost:5238/Home/Check";
     fetch(backendURL, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'coordinates': json
+            'LatLng-Model': JSON.stringify(latLngModel)
         },
 
     })
@@ -226,7 +224,6 @@ function addLine() {
             // Добавляем координаты в массив для создания линии
             drawnLines.push(latLng);
 
-            // Если у нас уже есть как минимум две точки, рисуем линию
             if (drawnLines.length === 2) {
                 lines.push(L.polyline(drawnLines, { color: 'black' }).addTo(map));
                 // Удаляем маркеры после построения линии

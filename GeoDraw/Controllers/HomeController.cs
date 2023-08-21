@@ -1,5 +1,6 @@
 ﻿using GeoDraw.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Npgsql;
 using Repository;
 
@@ -68,11 +69,14 @@ namespace GeoDraw.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Check([FromHeader] Coordinates coordinates)
+        public async Task<ActionResult> Check()
         {
             try
             {
-                string responce = await FigureRepository.CheckFigure(coordinates);
+                string latLngModelJson = Request.Headers["LatLng-Model"];
+                Coordinates latLngModel = JsonConvert.DeserializeObject<Coordinates>(latLngModelJson);
+
+                string responce = await FigureRepository.CheckFigure(latLngModel);
 
                 return Ok(responce);
             }

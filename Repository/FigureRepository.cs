@@ -117,12 +117,11 @@ public class FigureRepository : IFigureRepository
             {
                 command.Connection = connection;
 
-                string sql = "SELECT 'rectangles' AS source, id, name, geom " +
-                    "FROM rectangles " +
-                    "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)" +
-                    "UNION ALL" +
-                    "SELECT 'polygons' AS source, id, name, geom" +
-                    "FROM polygons" +
+                string sql = "SELECT 'rectangles' AS source, id, name, geom FROM rectangles " +
+                    "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1) " +
+                    "UNION ALL " +
+                    "SELECT 'polygons' AS source, id, name, geom " +
+                    "FROM polygons " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)";
                 string replacedLng = sql.Replace("@lng", coordinates.lng.ToString());
                 string replacedLat = replacedLng.Replace("@lat", coordinates.lat.ToString());
