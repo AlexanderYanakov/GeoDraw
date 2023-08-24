@@ -25,8 +25,8 @@ public class FigureRepository : IFigureRepository
                 {
                     command.Connection = connection;
                     command.CommandText = "INSERT INTO markers(geom, name) VALUES(ST_SetSRID(ST_MakePoint(@lon, @lat), 4326), @name)";
-                    command.Parameters.AddWithValue("lon", coordinates.lng);
-                    command.Parameters.AddWithValue("lat", coordinates.lat);
+                    command.Parameters.AddWithValue("lon", coordinates.Lng);
+                    command.Parameters.AddWithValue("lat", coordinates.Lat);
                     command.Parameters.AddWithValue("name", "Marker");
 
                     await command.ExecuteNonQueryAsync();
@@ -50,7 +50,7 @@ public class FigureRepository : IFigureRepository
                     string wktLine = "LINESTRING(";
                     foreach (Coordinates coordinates in lineCoordinates)
                     {
-                        wktLine += $"{coordinates.lng} {coordinates.lat},";
+                        wktLine += $"{coordinates.Lng} {coordinates.Lat},";
                     }
                     wktLine = wktLine.TrimEnd(',') + ")";
 
@@ -94,7 +94,7 @@ public class FigureRepository : IFigureRepository
                     string crdRectangle = "'LINESTRING(";
                     foreach (Coordinates coordinates in rectangleCoordinates)
                     {
-                        crdRectangle += $"{coordinates.lng} {coordinates.lat}, ";
+                        crdRectangle += $"{coordinates.Lng} {coordinates.Lat}, ";
                     }
                     int lastIndex = crdRectangle.LastIndexOf(",");
                     string coordinatesString = null;
@@ -141,8 +141,8 @@ public class FigureRepository : IFigureRepository
                     "FROM polygons " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)";
 
-                string replacedLng = sql.Replace("@lng", coordinates.lng.ToString());
-                string replacedLat = replacedLng.Replace("@lat", coordinates.lat.ToString());
+                string replacedLng = sql.Replace("@lng", coordinates.Lng.ToString());
+                string replacedLat = replacedLng.Replace("@lat", coordinates.Lat.ToString());
                 command.CommandText = replacedLat;
 
                 using (var reader = await command.ExecuteReaderAsync())

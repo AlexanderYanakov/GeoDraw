@@ -64,8 +64,8 @@ namespace GeoDraw.Controllers
         {
             coordinates.ForEach(x =>
             {
-                x.lng += 1;
-                x.lat += 1;
+                x.Lng += 1;
+                x.Lat += 1;
             });
         }
 
