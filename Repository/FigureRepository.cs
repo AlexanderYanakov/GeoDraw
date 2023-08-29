@@ -126,7 +126,8 @@ public class FigureRepository : IFigureRepository
                 command.Connection = connection;
 
                 string sql =
-                    "SELECT 'rectangles' AS name, ST_AsText(geom) FROM rectangles " +
+                    "SELECT 'rectangles' AS name, ST_AsText(geom) " +
+                    "FROM rectangles " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1) " +
                     "UNION ALL " +
                     "SELECT 'polygons' AS name, ST_AsText(geom) " +
@@ -134,11 +135,11 @@ public class FigureRepository : IFigureRepository
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)" +
                     "UNION ALL " +
                     "SELECT 'markers' AS name, ST_AsText(geom) " +
-                    "FROM polygons " +
+                    "FROM markers " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)" +
                     "UNION ALL " +
                     "SELECT 'lines' AS name, ST_AsText(geom) " +
-                    "FROM polygons " +
+                    "FROM lines " +
                     "WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography, 1)";
 
                 string replacedLng = sql.Replace("@lng", coordinates.Lng.ToString());
